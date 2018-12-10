@@ -1,11 +1,7 @@
 # Demonstration of istio authentication and rules
 These demos create three namespaces with two apps in each (httpbin and sleep)
 
-The first demo `demo-1.sh` sets up and shows how a mesh works. 
-
-The second demo `demo-2.sh` shows how mutual tls can be used.
-
-`demo-3.sh` is incomplete and untested 
+The first demo `demo-full.sh` sets up and shows how a mesh works. 
 
 # Quick Start
 `demo-full.sh create`
