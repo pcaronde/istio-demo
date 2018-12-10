@@ -8,17 +8,16 @@ The second demo `demo-2.sh` shows how mutual tls can be used.
 `demo-3.sh` is incomplete and untested 
 
 # Quick Start
-`demo-1.sh setup`
+`demo-full.sh create`
 
-`demo-1.sh test`
+`demo-full.sh test`
 
-`demo-1.sh mesh`
+`demo-full.sh mesh`
 
-`demo-1.sh cleanup`
+`demo-full.sh info`
 
-`demo-1.sh info`
-
-1. Helm install
+# To install Istio from scratch
+1. Helm install 
 helm template ../istio-1.0.4/install/kubernetes/helm/istio --name istio --namespace istio-system --set global.configValidation=false --set sidecarInjectorWebhook.enabled=false --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true > istio_aws_no_injection.yaml
 ```
 Then `kubectl create -f istio_aws_no_injection.yaml`
@@ -83,10 +82,7 @@ The files are
 .
 ├── README.md
 ├── check_istio.sh
-├── demo-1.sh
-├── demo-2.sh
-├── demo-3.sh
-├── dockerio-egress.yaml
+├── demo-full1.sh
 ├── google-egress.yaml
 ├── httpbin-egress.yaml
 ├── httpbin-gateway.yaml
@@ -132,6 +128,3 @@ The files are
     ├── website-routing-canary.yaml
     └── website-routing.yaml
 ```
-
-
-# istio-demo
