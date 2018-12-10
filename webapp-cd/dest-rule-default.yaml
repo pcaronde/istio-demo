@@ -1,0 +1,17 @@
+# Default destination rule
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: website
+spec:
+  host: website
+  subsets:
+  - name: version-1
+    labels:
+      version: website-version-1
+  - name: version-2
+    labels:
+      version: website-version-2
+  - name: version-3
+    labels:
+      version: website-version-3

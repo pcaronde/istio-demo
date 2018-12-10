@@ -1,0 +1,10 @@
+apiVersion: "authentication.istio.io/v1alpha1"
+kind: "Policy"
+metadata:
+  name: "permissive-website"
+spec:
+  targets:
+  - name: website
+  peers:
+  - mtls:
+      mode: PERMISSIVE
