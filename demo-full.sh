@@ -14,7 +14,7 @@ NORMAL='\033[0m'
 # Set some basic variables
 kcmd="kubectl"
 icmd="istictl"
-namesp_array=( dagmar1 dagmar2 dagmar3 )
+namesp_array=( demo1 demo2 demo3 )
 
 case $1 in
 # Create three namespaces and two deployments with injected sidecar proxies
