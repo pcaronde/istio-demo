@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # A Simple demo to show functionality of Istio 
 # Created by P. Caron 09.11.2018
 # This is a script using the files and tools from Istio Authentication Policy
