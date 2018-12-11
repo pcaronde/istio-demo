@@ -14,7 +14,7 @@ NORMAL='\033[0m'
 # Set some basic variables
 kcmd="kubectl"
 icmd="istictl"
-namesp_array=( demo1 demo2 demo3 )
+namesp_array=( dagmar1 dagmar2 dagmar3 )
 
 case $1 in
 # Create three namespaces and two deployments with injected sidecar proxies
@@ -44,13 +44,16 @@ test)
     for from in ${namesp_array[*]}; do for to in ${namesp_array[*]}; do $kcmd exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name}) -c sleep -n ${from} -- curl http://httpbin.${to}:8000/ip -s -o /dev/null -w "sleep.${from} to httpbin.${to}: %{http_code}\n"; done; done
 
     echo -e "\n\033[1mSingle curl test:\033[0m"
-    echo "$kcmd exec $(kubectl get pod -l app=sleep -n "${namesp_array[1]}" -o jsonpath={.items..metadata.name}) -c sleep -n "${namesp_array[0]}" -- curl http://httpbin."${namesp_array[0]}":8000/ip -s -o /dev/null -w '%{http_code}'"
+    echo "$kcmd exec $(kubectl get pod -l app=sleep -n "${namesp_array[0]}" -o jsonpath={.items..metadata.name}) -c sleep -n "${namesp_array[0]}" -- curl http://httpbin."${namesp_array[0]}":8000/ip -s -o /dev/null -w '%{http_code}\n'"
     echo -e "\n\033[0;34mNext: we'll makes sure that there is no mesh policy or default destination rule\033[0m"
     echo -e "\n\033[1mAuthentication policies\033[0m"
     $kcmd get policies.authentication.istio.io --all-namespaces
     echo -e "\n\033[1mDefault mesh policy\033[0m"
     $kcmd get meshpolicies.authentication.istio.io 
     $kcmd get meshpolicies.authentication.istio.io -oyaml
+    echo -e "\n\033[1mDestination rules\033[0m"
+    $kcmd get destinationrules.networking.istio.io --all-namespaces
+
     
     echo -e "\n\033[0;34mTest egress to Google\033[0m"
     for from in ${namesp_array[*]}; do $kcmd exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name}) -c sleep -n ${from} -- curl -I https://www.google.com -s -o /dev/null -w "sleep.${from} to Google: %{http_code}\n"; done
