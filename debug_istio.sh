@@ -40,7 +40,8 @@ elif [ "$1" == "info" ]; then
     $kcmd get destinationrules.networking.istio.io --all-namespaces -o yaml | grep "host:"
     echo -e "\n\033[1mCurrent Ingress\033[0m"
     $kcmd get svc istio-ingressgateway -n istio-system
-
+    echo -e "\n\033[1mCurrent TLS Conflicts\033[0m"
+    $icmd authn tls-check | grep CONFLICT
 # Usage
 else
     echo -e "\n\033[1mUsage:\n\033[0m$0 [arguments]" 
