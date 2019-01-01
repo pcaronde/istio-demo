@@ -5,17 +5,30 @@
 
 kcmd=kubectl
 icmd=istioctl
-# Set source and target container apps (e.g. sleepi and httpbin)
-source_container="sleep"
-target_container="httpbin"
-target_port="8000"
+# Set source and target container apps (e.g. sleep and httpbin)
+#source_container="sleep"
+#target_container="httpbin"
+#target_port="8000"
 target_ns="default"
+source_container="$2"
+target_container="$3"
+target_port="$4"
 
 # Just run a basic curl test
 if [ "$1" == "test" ] ; then
 echo "Single curl test:"
-echo "kubectl exec $(kubectl get pod -l app=$source_container -n $target_ns -o jsonpath={.items..metadata.name}) -c $source_container -n $target_ns -- curl http://$target_container.$target_ns:$target_port/ip -s -o /dev/null -w '%{http_code}'"
-echo -e "\nNext: we'll makes sure that there is noe mesh policy or default destination rule"
+# debug
+echo $source_container
+echo $target_container
+echo $target_port
+
+echo "kubectl exec $(kubectl get pod -l app=$source_container -n $target_ns -o jsonpath={.items..metadata.name}) -c $source_container -n $target_ns -- curl http://$target_container:$target_port/ -s -o /dev/null -w '%{http_code}'"
+kubectl exec $(kubectl get pod -l app=$source_container -n $target_ns -o jsonpath={.items..metadata.name}) -c $source_container -n $target_ns -- curl http://$target_container:$target_port/ -s -o /dev/null -w '%{http_code}'
+echo ""
+exit 0
+
+elif [ "$1" == "check" ]; then
+echo -e "\nMake sure that there is no mesh policy or default destination rule"
     echo "Authentication policies"
     $kcmd get policies.authentication.istio.io --all-namespaces
     echo "Default mesh policy"
@@ -45,6 +58,6 @@ elif [ "$1" == "info" ]; then
 # Usage
 else
     echo -e "\n\033[1mUsage:\n\033[0m$0 [arguments]" 
-    echo -e "\033[1m ex:\033[0m $0 [test | info]"
+    echo -e "\033[1m ex:\033[0m $0 [test | info] <source> <target> <port>"
 fi
 
