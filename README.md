@@ -15,10 +15,10 @@ If you just want to dive in and see what happens,
 `demo-tls.sh`		
 `demo-web.sh`	
 
-*WARNING*
+**WARNING**
 This is intended to be used as a learning demonstration. Your milage may vary. 
 
-*Do not do this on a production system.*
+**Do not do this on a production system.**
 
 # To install Istio from scratch
 1. Helm install 
