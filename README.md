@@ -3,14 +3,22 @@ These demos create three namespaces with two apps in each (httpbin and sleep)
 
 The first demo `demo-full.sh` sets up and shows how a mesh works. 
 
-# Quick Start
-`demo-full.sh create`
+# Quick start
+If Istio is already installed, the demo can be used directly.
+I have collected some useful commands which might save typing time.
+`check_istio.sh`
+`istiotio.shi`		
 
-`demo-full.sh test`
+If you just want to dive in and see what happens, 
+`demo-full.sh`		
+`demo-tls-no-sidecar.sh `
+`demo-tls.sh`		
+`demo-web.sh`	
 
-`demo-full.sh mesh`
+*WARNING*
+This is intended to be used as a learning demonstration. Your milage may vary. 
 
-`demo-full.sh info`
+*Do not do this on a production system.*
 
 # To install Istio from scratch
 1. Helm install 
