@@ -19,7 +19,7 @@ helm template ../istio-1.0.4/install/kubernetes/helm/istio --name istio --namesp
 ```
 Then `kubectl create -f istio_aws_no_injection.yaml`
 
-2. AWS EKS does not support automatice sidecar inject so it must be disabled. GCE and most stand-alone K8S support it but you may wish to disable it to start.
+2. As of November 2018, AWS EKS did not support automatic sidecar injection so it had be disabled. (AWS EKS supports automatic injection as of December 2018) GCE and most stand-alone K8S support it but you may wish to disable it to start.
 a. When implementing ISTIO Service Mesh with Helm you may wish to disable automatic sidecar injection. Set 'sidecarInjectorWebhook.enabled=false'
 and --set global.configValidation=false
 ```bash
@@ -31,7 +31,20 @@ helm install \
     --set global.configValidation=false \
     --set sidecarInjectorWebhook.enabled=false
 ```
-If you already installed and want to update
+Another option is to use the helm template and adjust your setting inside the resulting yaml file. This method allows you to see exactly what is going to happen and make adjustments at any time. The minimal option is
+```
+helm template install/kubernetes/helm/istio \
+  --name istio \
+  --namespace istio-system \
+  --set security.enabled=false \
+  --set galley.enabled=false \
+  --set sidecarInjectorWebhook.enabled=false \
+  --set mixer.enabled=false \
+  --set prometheus.enabled=false \
+  --set global.proxy.envoyStatsd.enabled=false \
+  --set pilot.sidecar=false > istio-minimal.yaml
+``` 
+If you already installed Istio and and want to update use the follwoing as with any helm installation
 ```
 helm upgrade --wait \
              --set global.configValidation=false \
@@ -42,7 +55,7 @@ helm upgrade --wait \
 If the namespace istio-system has already been created and the upgrade does not work, try deleting the ns, recreating it and running the helm again with configValidation and sidecarInjectorWehook = false
 b. other option here.
 
-To create deployment and insert sidecar manually
+To create deployment and insert sidecar manually in a single step (recommended)
 ```bash
 istioctl kube-inject -f samples/sleep/sleep.yaml | kubectl apply -f -
 ```
@@ -55,6 +68,7 @@ $ istioctl kube-inject \
     --output sleep-injected.yaml
 $ kubectl apply -f sleep-injected.yaml
 ```
+3. Once Istio is installed and working, you can proceed to do things with it.
 
 To apply istio settings (inject a sidecar) into existing deployments
 ```bash
@@ -73,19 +87,47 @@ kubectl get namespace -L istio-injection
 ```
 Finally, **External LoadBalancers (AWS,GCE)** have to be managed differently by creating a new policy and attaching it to the master role nodes.
 see https://istio.io/blog/2018/aws-nlb/ for a description.
-## Files
-The files are
+
+If you choose to use multiple ingress controllers, you'll need to pay attention to ingress class settings and selector in the gateway definition (Istio) or in the ingress for each service (traefik or nginx)
+
+*Istio Gateway*
 ```
-.
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+```
+*Traefik example* (https://docs.traefik.io/user-guide/kubernetes/)
+```
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: traefik
+
+```
+## Files
+The files for this demo are (mostly) tested. I have run the basic demos on EKS and GCE as well as a "standard" K8S v.1.11.5. But I make no promises.
+```
 ├── README.md
 ├── check_istio.sh
-├── demo-full1.sh
-├── google-egress.yaml
-├── httpbin-egress.yaml
+├── cheese
+│   ├── cheese-deployments.yaml
+│   ├── cheese-ingress.yaml
+│   └── cheese-services.yaml
+├── debug_istio.sh
+├── demo-full.sh
+├── demo-tls-no-sidecar.sh
+├── demo-tls.sh
+├── demo-web.sh
+├── extras
+│   ├── dockerio-egress.yaml
+│   ├── google-egress.yaml
+│   ├── httpbin-egress.yaml
+│   └── httpbin-injected.yaml
+├── get_ingress.sh
 ├── httpbin-gateway.yaml
 ├── httpbin-gw-svc.yaml
 ├── httpbin-ingress.yaml
-├── httpbin-injected.yaml
 ├── httpbin-svc.yaml
 ├── httpbin-virtualservice.yaml
 ├── httpbin.yaml
@@ -96,12 +138,13 @@ The files are
 │   ├── appversion-instance.yaml
 │   ├── checkversion-rule.yaml
 │   ├── default-dest-rule.yaml
+│   ├── dest-local.yaml
 │   ├── dest-rule-bad.yaml
 │   ├── dest-rule-permissive.yaml
 │   ├── dest-rule-tls.yaml
 │   ├── mesh-policy.yaml
+│   ├── ns-demo3-rule.yaml
 │   ├── ns-policy.yaml
-│   ├── ns-prod-rule.yaml
 │   ├── override_httpbin_dest-rule.yaml
 │   ├── override_httpbin_policy.yaml
 │   ├── service-policy.yaml
@@ -115,6 +158,10 @@ The files are
 │   ├── istio_aws_no_injection_trace.yaml
 │   └── zipkin.yaml
 ├── sleep.yaml
+├── ssl
+│   ├── tls.crt
+│   └── tls.key
+├── traefik-ui.yaml
 └── webapp-cd
     ├── dest-rule-default.yaml
     ├── dest-rule-disable.yaml
