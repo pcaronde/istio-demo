@@ -113,6 +113,13 @@ metadata:
     kubernetes.io/ingress.class: traefik
 
 ```
+
+# Some Istio Utilities
+`kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=kiali -o jsonpath='{.items[0].metadata.name}') 20001:20001`
+`kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000`
+If you have Weave installed
+`kubectl -n weave port-forward $(kubectl -n weave get pod -l app=weave-scope-app -o jsonpath='{.items[0].metadata.name}') 4040:4040`
+
 ## Files
 The files for this demo are (mostly) tested. I have run the basic demos on EKS and GCE as well as a "standard" K8S v.1.11.5. But I make no promises.
 ```
