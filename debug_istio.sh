@@ -2,7 +2,9 @@
 # A dirty script to check istio status or check connectivity between containers
 # Scribbled 15.11.2018 P.Caron
 # pcaron.de@protonmail.com
-
+INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') 
+INGRESS_PORT=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].port}') 
+GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
 kcmd=kubectl
 icmd=istioctl
 # Set source and target container apps (e.g. sleep and httpbin)
@@ -52,7 +54,10 @@ elif [ "$1" == "info" ]; then
     # Verify that there are no destination rules that apply on the example services. 
     $kcmd get destinationrules.networking.istio.io --all-namespaces -o yaml | grep "host:"
     echo -e "\n\033[1mCurrent Ingress\033[0m"
-    $kcmd get svc istio-ingressgateway -n istio-system
+        $kcmd get svc istio-ingressgateway -n istio-system
+        echo "INGRESS_HOST: "$INGRESS_HOST
+        echo "INGRESS_PORT: "$INGRESS_PORT
+        echo "GATEWAY_URL: "$GATEWAY_URL
     echo -e "\n\033[1mCurrent TLS Conflicts\033[0m"
     $icmd authn tls-check | grep CONFLICT
 # Usage
