@@ -9,7 +9,7 @@
 kcmd="kubectl"
 icmd="istioctl"
 target_ns="default"
-
+action="apply"
 #==============================================================================
 # Do stuff to the deployments
 #==============================================================================
@@ -23,22 +23,26 @@ elif [ "$1" == "delete" ];then
     $kcmd delete -f webapp-cd/my-websites.yaml -n $target_ns
 elif [ "$1" == "test" ];then
 # Test access
-sleep=`kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name} -n $target_ns`
+echo -e "\033[34mExpect:\033[0m HTTP/1.1 200 OK"
+sleep=`kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name} -n "$target_ns"`
     if [ ! -z "$sleep" ]; then
-        $kcmd exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name} -n $target_ns) -c istio-proxy -- curl https://my-nginx -k
-        echo -e "\033[34mExpect:\033[0m <h1>Welcome to nginx!</h1>"
+        $kcmd exec $sleep -n "$target_ns" -n default -- curl -I http://website
     else 
-        echo "Nothing seems to be running!"
+        echo -e "\033[35mSomething went wrong\033[0m"
     fi
 # Usage
 else 
     echo -e "\033[1mUsage:\033[0m\n $0 [apply | delete | test ]"
+    exit 0
 fi
 
 #==============================================================================
 # Do stuff with the routing, rules, policies and ingresses
 #==============================================================================
-$kcmd $action -f webapp-cd/website-routing-canary.yaml
-$kcmd $action -f webapp-cd/<ingress>
-
+$kcmd -n $target_ns $action -f webapp-cd/website-routing-canary.yaml
+# Uncomment if needed
+#$kcmd $action -f webapp-cd/<ingress>
+echo -e "\033[33m"
+read -p "Press [Enter] key to display istio settings for $target_ns"
+echo -e "\033[0m"
 $kcmd get pods,svc,gateways,virtualservices,ing -n $target_ns
