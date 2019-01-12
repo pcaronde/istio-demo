@@ -36,7 +36,8 @@ create)
     echo "stage          httpbin-7bc685687b-5bgsm                2/2     Running     0          2m"
     echo "stage          sleep-5cdc56d85d-kjgrf                  2/2     Running     0          119s"
 
-    echo -e "\n\033[0;34mNext, run $0 test\033[0m"
+    echo -e "\n\033[0;34mRun $0 egress if you want to set up an egrees to Google\033[0m"
+    echo -e "\n\033[0;34mRun $0 test\033[0m"
     exit 0
 ;;
 # Test environment access between deplyoments (in and within namespaces)
