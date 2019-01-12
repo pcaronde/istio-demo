@@ -51,7 +51,8 @@ test)
     $kcmd get policies.authentication.istio.io --all-namespaces
     echo -e "\n\033[1mDefault mesh policy\033[0m"
     $kcmd get meshpolicies.authentication.istio.io 
-    $kcmd get meshpolicies.authentication.istio.io -oyaml
+# Uncomment following line if you wish to see and debug yaml output of mesh policy
+#    $kcmd get meshpolicies.authentication.istio.io -oyaml
     echo -e "\n\033[1mDestination rules\033[0m"
     $kcmd get destinationrules.networking.istio.io --all-namespaces
 
