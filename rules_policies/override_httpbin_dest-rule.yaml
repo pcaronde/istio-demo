@@ -3,7 +3,7 @@ kind: DestinationRule
 metadata:
  name: "httpbin"
 spec:
- host: "httpbin.default.svc.cluster.local"
+ host: "httpbin.demo3.svc.cluster.local"
  trafficPolicy:
    tls:
      mode: DISABLE
