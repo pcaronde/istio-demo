@@ -15,19 +15,19 @@ target_ns="default"
 # Apply
 if [ "$1" == "apply" ];then
     action="apply"
-    $kcmd apply -f <(istioctl kube-inject -f webapp-cd/my-websites.yaml) -n $target_ns
+    $kcmd apply -f <(istioctl kube-inject -f websites-config/websites-demo.yaml) -n $target_ns
     #==============================================================================
     # Apply routing, rules, policies and ingresses
     #==============================================================================
-    $kcmd -n $target_ns apply -f webapp-cd/website-routing-canary.yaml
+#    $kcmd -n $target_ns apply -f websites-config/website-routing-canary.yaml
 # Delete
 elif [ "$1" == "delete" ];then
     action="delete"
-    $kcmd delete -f webapp-cd/my-websites.yaml -n $target_ns
+    $kcmd delete -f websites-config/websites-demo.yaml -n $target_ns
     #==============================================================================
     # Delete routing, rules, policies and ingresses
     #==============================================================================
-    $kcmd -n $target_ns delete -f webapp-cd/website-routing-canary.yaml
+#    $kcmd -n $target_ns delete -f websites-config/website-routing-canary.yaml
 elif [ "$1" == "test" ];then
 # Test access
 echo -e "\033[34mRunning curl against http://website\033[0m "
@@ -48,7 +48,7 @@ else
 fi
 
 # Uncomment if needed
-#$kcmd $action -f webapp-cd/<ingress>
+#$kcmd $action -f websites-config/<ingress>
 echo -e "\033[32m"
 read -p "Press [Enter] key to display istio settings for $target_ns"
 echo -e "\033[0m"
