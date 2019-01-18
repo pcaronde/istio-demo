@@ -16,6 +16,15 @@ kcmd="kubectl"
 icmd="istictl"
 namesp_array=( demo1 demo2 demo3 )
 
+usage() {
+  cat <<"EOF"
+USAGE:
+    Usage:
+     demo-full.sh [create | mesh | test | info | override | cleanup]
+EOF
+  exit 1
+}
+
 case $1 in
 # Create three namespaces and two deployments with injected sidecar proxies
 create)
@@ -36,7 +45,7 @@ create)
     echo "stage          httpbin-7bc685687b-5bgsm                2/2     Running     0          2m"
     echo "stage          sleep-5cdc56d85d-kjgrf                  2/2     Running     0          119s"
 
-    echo -e "\n\033[0;34mRun $0 egress if you want to set up an egrees to Google\033[0m"
+    echo -e "\n\033[0;34mRun $0 egress if you want to set up an egrees to CNN and/or Google\033[0m"
     echo -e "\n\033[0;34mRun $0 test\033[0m"
     exit 0
 ;;
@@ -74,8 +83,12 @@ exit 0
 ;;
 egress)
     echo -e "${BLUE}\nSet Egress for Google${NORMAL}"
-
     $kcmd apply -f extras/google-egress.yaml -n "${namesp_array[0]}"  
+   
+    echo -e "${BLUE}\nSet Egress for CNN and Test${NORMAL}"
+    $kcmd apply -f extras/cnn-egress.yaml -n "${namesp_array[0]}"
+    $kcmd apply -f extras/cnn-service-entry.yaml -n "${namesp_array[0]}"
+    $kcmd -n "${namesp_array[0]}" exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name})-c sleep -- curl -sL -o /dev/null -D - https://edition.cnn.com/politics
 ;;
 override)
     echo -e "\n\033[1mOverride default mesh policy for ${namesp_array[0]}:\033[0m"
@@ -83,16 +96,17 @@ override)
 ;;
 # Cleanup and delete demo deployments and services
 cleanup)
+    read -p "Press [Enter] complete Istio demo"
     # Cleanup details
-    echo -e "\n\033[1mCleanup is ...\033[0m"
+    echo -e "\n\033[1mCleanup ...\033[0m"
 # Not elegant
     cd rules_policies
     echo "$kcmd delete --ignore-not-found=true -f default-dest-rule.yaml"
     $kcmd delete --ignore-not-found=true -f default-dest-rule.yaml
     echo "$kcmd delete --ignore-not-found=true -f mesh-policy.yaml"
     $kcmd delete --ignore-not-found=true -f mesh-policy.yaml
-    echo "$kcmd delete --ignore-not-found=true -f override_dev.yaml"
-    $kcmd delete --ignore-not-found=true -f override_dev.yaml
+#    echo "$kcmd delete --ignore-not-found=true -f override_dev.yaml"
+#    $kcmd delete --ignore-not-found=true -f override_dev.yaml
 # return to main dir
     cd ..
     echo "Delete namespaces:  ${namesp_array[*]}"
@@ -153,8 +167,8 @@ echo -e "\n\033[1m \033[34mNOTE: Check destination rules to make nothing is left
 ;;
 # Usage
 *)
-#else
-    echo -e "\n\033[1mUsage:\n\033[0m$0 [arguments]" 
-    echo -e "\033[1m ex:\033[0m $0 [create | mesh | test | info | override | cleanup]"
-#fi
+    usage
+    #echo -e "\n\033[1mUsage:\n\033[0m$0 [arguments]" 
+    #echo -e "\033[1m ex:\033[0m $0 [create | mesh | test | info | override | cleanup]"
+
 esac

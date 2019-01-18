@@ -13,13 +13,13 @@ icmd="istioctl"
 #target_container="httpbin"
 #target_port="8000"
 if [ -z "$2" ];then
-    target_ns="default"
+    target_ns="demo3"
 else
     target_ns="$2"
 fi
 
 echo -e "\033[0;34mCreate a ConfigMap for Nginx\033[0m"
-$kcmd create configmap nginxconfigmap --from-file https/default.conf
+$kcmd create configmap nginxconfigmap --from-file https/default.conf -n $target_ns
 
 # Cleanup and create without TLS
 if [ "$1" == "notls" ];then
@@ -46,18 +46,18 @@ elif [ "$1" == "tls" ];then
 
     # This should fail
     echo -e "\033[0;34mMutual TLS enabled - should fail\033[0m"  
-    kubectl exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c sleep -- curl https://my-nginx -k
+    kubectl exec $(kubectl -n $target_ns get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c sleep -- curl https://my-nginx -k
     # This should pass
     echo -e "\033[0;34mMutual TLS enabled - should pass\033[0m"  
-    kubectl exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c istio-proxy -- curl https://httpbin:8000/headers -o /dev/null -s -w '%{http_code}\n' --key /etc/certs/key.pem --cert /etc/certs/cert-chain.pem --cacert /etc/certs/root-cert.pem -k
+    kubectl exec $(kubectl -n $target_ns get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c istio-proxy -- curl https://httpbin."$target_ns":8000/headers -o /dev/null -s -w '%{http_code}\n' --key /etc/certs/key.pem --cert /etc/certs/cert-chain.pem --cacert /etc/certs/root-cert.pem -k
 # Test if connections are working
 elif [ "$1" == "test" ];then
     $kcmd get pods -n $target_ns
     # Test Istio enabled
     echo -e "\n\033[1m curl my-nginx\033[0m"
-    $kcmd exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c sleep -- curl https://my-nginx -k
+    $kcmd exec $(kubectl -n $target_ns get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c sleep -- curl https://my-nginx -k
 
     # Test same from proxy
     echo -e "\n\033[1m curl my-nginx\033[0m"
-    $kcmd exec $(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c istio-proxy -- curl https://my-nginx -k
+    $kcmd exec $(kubectl -n $target_ns get pod -l app=sleep -o jsonpath={.items..metadata.name}) -n $target_ns -c istio-proxy -- curl https://my-nginx -k
 fi
