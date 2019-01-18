@@ -55,16 +55,6 @@ test)
 
     echo -e "\n\033[1mSingle curl test:\033[0m"
     echo "$kcmd exec $(kubectl get pod -l app=sleep -n "${namesp_array[0]}" -o jsonpath={.items..metadata.name}) -c sleep -n "${namesp_array[0]}" -- curl http://httpbin."${namesp_array[0]}":8000/ip -s -o /dev/null -w '%{http_code}\n'"
-    echo -e "\n\033[0;34mNext: we'll makes sure that there is no mesh policy or default destination rule\033[0m"
-    echo -e "\n\033[1mAuthentication policies\033[0m"
-    $kcmd get policies.authentication.istio.io --all-namespaces
-    echo -e "\n\033[1mDefault mesh policy\033[0m"
-    $kcmd get meshpolicies.authentication.istio.io 
-# Uncomment following line if you wish to see and debug yaml output of mesh policy
-#    $kcmd get meshpolicies.authentication.istio.io -oyaml
-    echo -e "\n\033[1mDestination rules\033[0m"
-    $kcmd get destinationrules.networking.istio.io --all-namespaces
-
     
     echo -e "\n\033[0;34mTest egress to Google\033[0m"
     for from in ${namesp_array[*]}; do $kcmd exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name}) -c sleep -n ${from} -- curl -I https://www.google.com -s -o /dev/null -w "sleep.${from} to Google: %{http_code}\n"; done
@@ -102,9 +92,9 @@ cleanup)
 # Not elegant
     cd rules_policies
     echo "$kcmd delete --ignore-not-found=true -f default-dest-rule.yaml"
-    $kcmd delete --ignore-not-found=true -f default-dest-rule.yaml
+    $kcmd delete --ignore-not-found=true -f rules_policies/efault-dest-rule.yaml
     echo "$kcmd delete --ignore-not-found=true -f mesh-policy.yaml"
-    $kcmd delete --ignore-not-found=true -f mesh-policy.yaml
+    $kcmd delete --ignore-not-found=true -f rules_policies/mesh-policy.yaml
 #    echo "$kcmd delete --ignore-not-found=true -f override_dev.yaml"
 #    $kcmd delete --ignore-not-found=true -f override_dev.yaml
 # return to main dir
@@ -113,6 +103,8 @@ cleanup)
     for ns in ${namesp_array[*]}; do $kcmd delete ns ${ns}; done
 
     $kcmd delete -n ${namesp_array[0]} -f extras/google-egress.yaml
+    $kcmd delete -f extras/cnn-egress.yaml -n "${namesp_array[0]}"
+    $kcmd delete -f extras/cnn-service-entry.yaml -n "${namesp_array[0]}"
     echo -e "\n\033[1m \033[34mNOTE: Check destination rules to make sure nothing is left-over\033[0m"
 ;;
 # Information about current policy and destination rules
