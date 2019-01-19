@@ -15,7 +15,7 @@ target_ns="default"
 # Apply
 if [ "$1" == "apply" ];then
     action="apply"
-    $kcmd apply -f <(istioctl kube-inject -f websites-config/websites-demo.yaml) -n $target_ns
+    $kcmd apply -f <(istioctl kube-inject -f websites-config/websites-demo.yaml -n $target_ns) -n $target_ns
     #==============================================================================
     # Apply routing, rules, policies and ingresses
     #==============================================================================
