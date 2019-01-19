@@ -1,0 +1,46 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: website-virtual-service
+spec:
+  hosts:
+  - "website-test.aws.atu.de"
+  gateways:
+  - website-gateway
+  http:
+  - match:
+    - uri:
+        regex: /website
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: website
+        subset: version-1
+      weight: 50
+    - destination:
+        host: website
+        subset: version-2
+      weight: 25
+    - destination:
+        host: website
+        subset: version-3
+      weight: 25
+    fault:
+      delay:
+        percent: 25
+        fixedDelay: 5s
+      abort:
+        percent: 25
+        httpStatus: 400
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: website-delay
+spec:
+  host: website
+  subsets:
+  - name: version-1
+    labels:
+      version: website-version-1
