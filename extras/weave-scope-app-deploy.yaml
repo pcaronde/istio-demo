@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    cloud.weave.works/launcher-info: |-
+      {
+        "original-request": {
+          "url": "/k8s/v1.10/scope.yaml?k8s-version=Q2xpZW50IFZlcnNpb246IHZlcnNpb24uSW5mb3tNYWpvcjoiMSIsIE1pbm9yOiIxMiIsIEdpdFZlcnNpb246InYxLjEyLjIiLCBHaXRDb21taXQ6IjE3Yzc3Yzc4OTgyMTgwNzNmMTRjOGQ1NzM1ODJlOGQyMzEzZGM3NDAiLCBHaXRUcmVlU3RhdGU6ImNsZWFuIiwgQnVpbGREYXRlOiIyMDE4LTEwLTMwVDIxOjM5OjE2WiIsIEdvVmVyc2lvbjoiZ28xLjExLjEiLCBDb21waWxlcjoiZ2MiLCBQbGF0Zm9ybToiZGFyd2luL2FtZDY0In0KU2VydmVyIFZlcnNpb246IHZlcnNpb24uSW5mb3tNYWpvcjoiMSIsIE1pbm9yOiIxMSsiLCBHaXRWZXJzaW9uOiJ2MS4xMS41LWVrcy02YmFkNmQiLCBHaXRDb21taXQ6IjZiYWQ2ZDljNzY4ZGMwODY0ZGFiNDhhMTE2NTNhYTUzYjVhNDcwNDMiLCBHaXRUcmVlU3RhdGU6ImNsZWFuIiwgQnVpbGREYXRlOiIyMDE4LTEyLTA2VDIzOjEzOjE0WiIsIEdvVmVyc2lvbjoiZ28xLjEwLjMiLCBDb21waWxlcjoiZ2MiLCBQbGF0Zm9ybToibGludXgvYW1kNjQifQo=",
+          "date": "Fri Jan 18 2019 16:17:09 GMT+0000 (UTC)"
+        },
+        "email-address": "support@weave.works"
+      }
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: weave-scope
+    name: weave-scope-app
+    weave-cloud-component: scope
+    weave-scope-component: app
+  name: weave-scope-app
+  namespace: weave
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: weave-scope
+      name: weave-scope-app
+      weave-cloud-component: scope
+      weave-scope-component: app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: weave-scope
+        name: weave-scope-app
+        weave-cloud-component: scope
+        weave-scope-component: app
+    spec:
+      containers:
+      - args:
+        - --mode=app
+        command:
+        - /home/weave/scope
+        image: docker.io/weaveworks/scope:1.10.1
+        imagePullPolicy: IfNotPresent
+        name: app
+        ports:
+        - containerPort: 4040
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
