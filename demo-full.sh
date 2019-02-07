@@ -20,22 +20,23 @@ usage() {
   cat <<"EOF"
 USAGE:
     Usage:
-     demo-full.sh [create | mesh | test | info | override | cleanup]
+     demo-full.sh [install | mesh | test | info | override | cleanup]
 EOF
   exit 1
 }
 
 case $1 in
 # Create three namespaces and two deployments with injected sidecar proxies
-create)
+install)
     for i in "${namesp_array[@]}"
         do
             $kcmd create ns $i
             echo -e "\033[1mCreating two deployments and injecting a sidecar proxy\033[0m"
-            $kcmd apply -f <(istioctl kube-inject -f httpbin.yaml) -n $i
+            $kcmd apply -f <(istioctl kube-inject -f httpbin.yaml -n $1) -n $i
             $kcmd apply -f <(istioctl kube-inject -f sleep.yaml) -n $i
             $kcmd get pods -n $i
         done
+    $kcmd apply -f <(istioctl kube-inject -f sleep.yaml) -n default
     echo "Completed"
     echo "Wait for all instances to start"
     echo "$kcmd get pods --all-namespaces -w"
@@ -51,7 +52,7 @@ create)
 ;;
 # Test environment access between deplyoments (in and within namespaces)
 test)
-    for from in ${namesp_array[*]}; do for to in ${namesp_array[*]}; do $kcmd exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name}) -c sleep -n ${from} -- curl http://httpbin.${to}:8000/ip -s -o /dev/null -w "sleep.${from} to httpbin.${to}: %{http_code}\n"; done; done
+    for from in ${namesp_array[*]}; do for to in ${namesp_array[*]}; do $kcmd exec $(kubectl get pod -l app=sleep -n "${from}" -o jsonpath={.items..metadata.name}) -c sleep -n "${from}" -- curl http://httpbin.${to}:8000/ip -s -o /dev/null -w "sleep.${from} to httpbin.${to}: %{http_code}\n"; done; done
 
     echo -e "\n\033[1mSingle curl test:\033[0m"
     echo "$kcmd exec $(kubectl get pod -l app=sleep -n "${namesp_array[0]}" -o jsonpath={.items..metadata.name}) -c sleep -n "${namesp_array[0]}" -- curl http://httpbin."${namesp_array[0]}":8000/ip -s -o /dev/null -w '%{http_code}\n'"
@@ -161,6 +162,6 @@ echo -e "\n\033[1m \033[34mNOTE: Check destination rules to make nothing is left
 *)
     usage
     #echo -e "\n\033[1mUsage:\n\033[0m$0 [arguments]" 
-    #echo -e "\033[1m ex:\033[0m $0 [create | mesh | test | info | override | cleanup]"
+    #echo -e "\033[1m ex:\033[0m $0 [install | mesh | test | info | override | cleanup]"
 
 esac
