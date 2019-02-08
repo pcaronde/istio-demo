@@ -6,7 +6,8 @@
 ## sleep loop
 for i in {1..10}
 do
-    time curl -IL http://website-test.aws.atu.de/website -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    time curl -IL http://35.246.103.254/website -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    #time curl -IL http://website-test.aws.atu.de/website -s -o /dev/null -w 'HTTP Response: %{http_code}'
     sleep 3s
 done
 
