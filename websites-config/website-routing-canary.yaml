@@ -24,7 +24,7 @@ metadata:
   name: website-virtual-service
 spec:
   hosts:
-  - "website-test.aws.atu.de"
+  - "*"
   gateways:
   - website-gateway
   http:
