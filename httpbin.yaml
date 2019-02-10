@@ -83,5 +83,3 @@ spec:
     route:
     - destination:
         host: httpbin
-        port:
-          number: 8000
