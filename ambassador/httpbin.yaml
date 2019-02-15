@@ -15,26 +15,12 @@
 ##################################################################################################
 # httpbin service
 ##################################################################################################
-#apiVersion: v1
-#kind: Service
-##metadata:
-#  name: httpbin
-#  labels:
-#    app: httpbin
-#spec:
-#  ports:
-#  - name: http
-#    port: 8000
-#  selector:
-#    app: httpbin
----
-##################################################################################################
-# Ambassador httpbin service
-##################################################################################################
 apiVersion: v1
 kind: Service
 metadata:
   name: httpbin
+  labels:
+    app: httpbin
   annotations:
     getambassador.io/config: |
       ---
@@ -42,12 +28,13 @@ metadata:
       kind:  Mapping
       name:  httpbin_mapping
       prefix: /httpbin/
-      service: httpbin.org:80
-      host_rewrite: httpbin.org
+      service: httpbin:8000
 spec:
   ports:
-  - name: httpbin
-    port: 80
+  - name: http
+    port: 8000
+  selector:
+    app: httpbin
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -98,11 +85,9 @@ spec:
     - uri:
         exact: /headers
     - uri:
-        prefix: /delay/.*
+        prefix: /delay/*
     - uri:
         prefix: /ip
     route:
     - destination:
         host: httpbin
-        port:
-          number: 8000
