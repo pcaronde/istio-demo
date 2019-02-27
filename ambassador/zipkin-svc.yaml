@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: jaeger
-    chart: tracing-1.0.5
+    chart: tracing-1.0.6
     heritage: Tiller
     release: release-name
   name: zipkin
@@ -14,10 +14,9 @@ metadata:
       apiVersion: ambassador/v1
       kind: TracingService
       name: tracing
-      service: zipkin:9411
+      service: zipkin.istio-system:9411
       driver: zipkin
 spec:
-  clusterIP: 10.19.242.136
   ports:
   - name: http
     port: 9411
@@ -26,4 +25,3 @@ spec:
   selector:
     app: jaeger
   sessionAffinity: None
-  type: ClusterIP

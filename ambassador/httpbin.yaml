@@ -28,7 +28,7 @@ metadata:
       kind:  Mapping
       name:  httpbin_mapping
       prefix: /httpbin/
-      service: httpbin:8000
+      service: httpbin.default:8000
 spec:
   ports:
   - name: http
@@ -83,9 +83,9 @@ spec:
   http:
   - match:
     - uri:
-        exact: /headers
+        prefix: /headers
     - uri:
-        prefix: /delay/*
+        prefix: /delay/.*
     - uri:
         prefix: /ip
     route:
