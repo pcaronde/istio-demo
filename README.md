@@ -7,13 +7,13 @@ The first demo `demo-full.sh` sets up and shows how a mesh works.
 If Istio is already installed, the demo can be used directly.
 I have collected some useful commands which might save typing time.
 `check_istio.sh`
-`istiotio.shi`		
+`istio-debug.sh`		
 
 If you just want to dive in and see what happens, 
-`demo-full.sh`		
-`demo-tls-no-sidecar.sh `
-`demo-tls.sh`		
-`demo-web.sh`	
+`demo-full.sh`		works in GKE
+`demo-tls-no-sidecar.sh ` needs testing
+`demo-tls.sh`	needs testing	
+`demo-web.sh`	works in GKE
 
 **WARNING**
 This is intended to be used as a learning demonstration. Your milage may vary. 
