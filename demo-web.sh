@@ -42,14 +42,16 @@ echo -e "\033[34mExpect a version number: \033[34mv1 70%, v2 25%, v3 5%\033[0m"
         echo -e "\033[35mSomething went wrong\033[0m"
     fi
 # Usage
-else 
-    echo -e "\033[1mUsage:\033[0m\n $0 [apply | delete | test ]"
+elif [ "$1" == "external-test" ]; then
+    watch -n 1 curl -o /dev/null -s -w %{http_code} https://demo.k8s-pcconsultants.de/website
+else
+    echo -e "\033[1mUsage:\033[0m\n $0 [apply | delete | test | external-test]"
     exit 0
 fi
 
 # Uncomment if needed
 #$kcmd $action -f websites-config/<ingress>
 echo -e "\033[32m"
-read -p "Press [Enter] key to display istio settings for $target_ns"
+read -p "Press [Enter] key to display istio settings for $target_ns of ctrl-c to cancel"
 echo -e "\033[0m"
 $kcmd get pods,svc,gateways,virtualservices,ing -n $target_ns
