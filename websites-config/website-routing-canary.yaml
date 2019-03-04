@@ -37,15 +37,15 @@ spec:
     - destination:
         host: website
         subset: version-1
-      weight: 70
+      weight: 60
     - destination:
         host: website
         subset: version-2
-      weight: 25
+      weight: 30
     - destination:
         host: website
         subset: version-3
-      weight: 5
+      weight: 10
 ---
 # Default destination rule
 apiVersion: networking.istio.io/v1alpha3
