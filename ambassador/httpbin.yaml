@@ -28,7 +28,8 @@ metadata:
       kind:  Mapping
       name:  httpbin_mapping
       prefix: /httpbin/
-      service: httpbin:8000
+      rewrite: /
+      service: httpbin.demo4:8000
 spec:
   ports:
   - name: http
@@ -69,7 +70,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "*"
+    - 'auth.k8s-pcconsultants.de'
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -83,9 +84,9 @@ spec:
   http:
   - match:
     - uri:
-        exact: /headers
+        prefix: /headers
     - uri:
-        prefix: /delay/*
+        prefix: /user-agent
     - uri:
         prefix: /ip
     route:

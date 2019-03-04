@@ -13,7 +13,7 @@ NORMAL='\033[0m'
 
 # Set some basic variables
 kcmd="kubectl"
-icmd="istictl"
+icmd="istioctl"
 namesp_array=( demo1 demo2 demo3 )
 
 usage() {

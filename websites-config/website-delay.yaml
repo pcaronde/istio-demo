@@ -29,7 +29,7 @@ spec:
     fault:
       delay:
         percent: 25
-        fixedDelay: 5s
+        fixedDelay: 2s
       abort:
         percent: 25
         httpStatus: 400

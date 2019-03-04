@@ -2,13 +2,21 @@
 # Simple script to generate some traffic for the demo
 # Author: P. Caron
 # pcaron.de@pm.me
-
-EXTERNAL_IP="$1"
+if [ -n "$1" ]; then
+    EXTERNAL_NAME="$1"
+    SERVICE="$2"
+else
+    EXTERNAL_NAME="demo"
+    SERVICE="headers"
+fi
 ## loop
-for i in {1..10}
+for i in {1..40}
 do
-    time curl -IL http://${EXTERNAL_IP}/headers -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    time curl -IL http://${EXTERNAL_NAME}.k8s-pcconsultants.de/${SERVICE} -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    time curl -IL https://demo.k8s-pcconsultants.de/ip -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    time curl -IL http://auth.k8s-pcconsultants.de/httpbin/headers -s -o /dev/null -w 'HTTP Response: %{http_code}'
+    time curl -IL https://demo.k8s-pcconsultants.de/productpage -s -o /dev/null -w 'HTTP Response: %{http_code}'
     #time curl -IL http://k8s-pcconsultants.de/website -s -o /dev/null -w 'HTTP Response: %{http_code}'
-    sleep 3s
+    sleep 1s
 done
 
