@@ -26,6 +26,14 @@ metadata:
       ---
       apiVersion: ambassador/v1
       kind:  Mapping
+      name:  mobile_ui_mapping
+      regex_headers:
+        user-agent: "^(?=.*\\bAndroid\\b)(?=.*\\b(m|M)obile\\b).*|(?=.*\\biPhone\\b)(?=.*\\b(m|M)obile\\b).*$"
+      prefix: /
+      service: httpbin.default:8000
+      ---
+      apiVersion: ambassador/v1
+      kind:  Mapping
       name:  httpbin_demo4_mapping
       prefix: /httpbin/
       rewrite: /
