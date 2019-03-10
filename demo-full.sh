@@ -26,8 +26,8 @@ EOF
 }
 
 case $1 in
-# Create three namespaces and two deployments with injected sidecar proxies
 install)
+# Create three namespaces and two deployments with injected sidecar proxies
     for i in "${namesp_array[@]}"
         do
             $kcmd create ns $i
