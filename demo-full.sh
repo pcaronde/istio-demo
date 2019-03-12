@@ -92,9 +92,9 @@ cleanup)
     echo -e "\n\033[1mCleanup ...\033[0m"
 # Not elegant
     cd rules_policies
-    echo "$kcmd delete --ignore-not-found=true -f default-dest-rule.yaml"
+    echo "$kcmd delete --ignore-not-found=true -f rules_policies/default-dest-rule.yaml"
     $kcmd delete --ignore-not-found=true -f rules_policies/efault-dest-rule.yaml
-    echo "$kcmd delete --ignore-not-found=true -f mesh-policy.yaml"
+    echo "$kcmd delete --ignore-not-found=true -f rules_policies/mesh-policy.yaml"
     $kcmd delete --ignore-not-found=true -f rules_policies/mesh-policy.yaml
 #    echo "$kcmd delete --ignore-not-found=true -f override_dev.yaml"
 #    $kcmd delete --ignore-not-found=true -f override_dev.yaml
