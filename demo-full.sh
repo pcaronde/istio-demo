@@ -9,6 +9,7 @@ ORANGE='\033[0;33m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 WHITE='\033[0;37m'
+BOLD='\033[1m'
 NORMAL='\033[0m'
 
 # Set some basic variables
@@ -20,7 +21,16 @@ usage() {
   cat <<"EOF"
 USAGE:
     Usage:
-     demo-full.sh [install | mesh | test | info | override | cleanup]
+     demo-full.sh [install | mesh | test | info | breaker | mesh | egress | override | cleanup]
+
+     install: installation of sleep and httpbin pods into namespaces demo1 demo2 and demo3
+     test: execute simple curl tests from sleep to httpbin in each namespace (9 test executions) and sleep to egress destinations
+     info: information on current state of Istio deployments, rules and policies
+     breaker: a circuit breaker example
+     egress: apply example egress rules (allow Google and CNN)
+     mesh: apply full mtls to all namespaces
+     override: create rules to override full mtls mesh
+     cleanup: delete all demo ns, deployments, rules and policies
 EOF
   exit 1
 }
@@ -72,10 +82,11 @@ mesh)
     $kcmd get meshpolicies.authentication.istio.io
 exit 0
 ;;
+# Set egress allow rules for CNN and Google
 egress)
     echo -e "${BLUE}\nSet Egress for Google${NORMAL}"
     $kcmd apply -f extras/google-egress.yaml -n "${namesp_array[0]}"  
-   
+    $kcmd -n "${namesp_array[0]}" exec $(kubectl get pod -l app=sleep -n ${from} -o jsonpath={.items..metadata.name})-c sleep -- curl -sL -o /dev/null -D - https://www.google.com
     echo -e "${BLUE}\nSet Egress for CNN and Test${NORMAL}"
     $kcmd apply -f extras/cnn-egress.yaml -n "${namesp_array[0]}"
     $kcmd apply -f extras/cnn-service-entry.yaml -n "${namesp_array[0]}"
@@ -108,6 +119,17 @@ cleanup)
     $kcmd delete -f extras/cnn-service-entry.yaml -n "${namesp_array[0]}"
     echo -e "\n\033[1m \033[34mNOTE: Check destination rules to make sure nothing is left-over\033[0m"
 ;;
+# Circuit breaker example
+breaker)
+    echo -e "${BOLD}${GREEN}Apply circuit breaker example${NORMAL}"
+    ${kcmd} apply -n default -f ./rules_policies/circuit-breaker.yaml
+    ${kcmd} apply -n default -f ./fortio/fortio-deploy.yaml
+    echo -e "${BOLD}${GREEN}Testing circuit breaker example ...${NORMAL}${BOLD}${ORANGE}Look for % of 503 errors${NORMAL}"
+    sleep 5 # allow startup
+    FORTIO_POD=$(kubectl get pod | grep fortio | awk '{ print $1 }')
+    ${kcmd} exec -it $FORTIO_POD  -c fortio /usr/local/bin/fortio -- load -c 2 -qps 0 -n 20 -loglevel Warning http://httpbin:8000/get
+;;
+
 # Information about current policy and destination rules
 info)
 #elif [ "$1" == "info" ]; then
