@@ -23,7 +23,7 @@ This is intended to be used as a learning demonstration. Your milage may vary.
 # To install Istio from scratch
 1. Helm install 
 ```
-helm template ../istio-1.0.4/install/kubernetes/helm/istio --name istio --namespace istio-system --set global.configValidation=false --set sidecarInjectorWebhook.enabled=false --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true > istio_aws_no_injection.yaml
+helm template ../istio-1.0.6/install/kubernetes/helm/istio --name istio --namespace istio-system --set global.configValidation=false --set sidecarInjectorWebhook.enabled=false --set grafana.enabled=true --set servicegraph.enabled=true --set tracing.enabled=true > istio_aws_no_injection.yaml
 ```
 Then `kubectl create -f istio_aws_no_injection.yaml`
 
@@ -116,8 +116,11 @@ metadata:
 
 # Some Istio Utilities
 `kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=kiali -o jsonpath='{.items[0].metadata.name}') 20001:20001`
+
 `kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=grafana -o jsonpath='{.items[0].metadata.name}') 3000:3000`
+
 If you have Weave installed
+
 `kubectl -n weave port-forward $(kubectl -n weave get pod -l name=weave-scope-app -o jsonpath='{.items[0].metadata.name}') 4040:4040`
 
 ## Files
