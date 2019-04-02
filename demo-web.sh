@@ -8,14 +8,14 @@
 #==============================================================================
 kcmd="kubectl"
 icmd="istioctl"
-target_ns="default"
+target_ns="demo4"
 #==============================================================================
 # Do stuff to the deployments
 #==============================================================================
 # Apply
 if [ "$1" == "apply" ];then
     action="apply"
-    $kcmd apply -f <(istioctl kube-inject -f websites-config/websites-demo.yaml -n $target_ns) -n $target_ns
+    $kcmd apply -f <(istioctl kube-inject -f websites-config/websites-demo.yaml) -n "$target_ns"
     #==============================================================================
     # Apply routing, rules, policies and ingresses
     #==============================================================================
@@ -35,10 +35,10 @@ echo -e "\033[34mExpect:\033[0m HTTP/1.1 200 OK\033[0m"
 
 sleep=`kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name} -n "$target_ns"`
     if [ ! -z "$sleep" ]; then
-        $kcmd exec $sleep -n "$target_ns" -n default -- curl -I http://website
+        $kcmd exec $sleep -n "$target_ns" -- curl -I http://website
 # check version
 echo -e "\033[34mExpect a version number: \033[34mv1 70%, v2 25%, v3 5%\033[0m"
-        $kcmd exec $sleep -n "$target_ns" -n default -- curl http://website | grep "version"
+        $kcmd exec $sleep -n "$target_ns" -- curl http://website | grep "version"
         echo "For external testing, use:"
         echo "watch -n 1 curl -o /dev/null -s -w %{http_code} https://demo.k8s-pcconsultants.de/website"
     else 

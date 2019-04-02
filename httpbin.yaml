@@ -1,17 +1,3 @@
-# Copyright 2017 Istio Authors
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-
 ##################################################################################################
 # httpbin service
 ##################################################################################################
@@ -46,7 +32,6 @@ spec:
         name: httpbin
         ports:
         - containerPort: 8000
-
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
@@ -60,16 +45,8 @@ spec:
       number: 80
       name: http
       protocol: HTTP
-    port:
-      number: 443
-      name: https
-      protocol: HTTPS
     hosts:
-    - "*"
-    tls:
-      mode: SIMPLE
-      privateKey: /etc/istio/ingressgateway-certs/tls.key
-      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+    - "demo.k8s-pcconsultants.de"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -77,7 +54,7 @@ metadata:
   name: httpbin
 spec:
   hosts:
-  - "*"
+  - "demo.k8s-pcconsultants.de"
   gateways:
   - httpbin-gateway
   http:
@@ -85,9 +62,11 @@ spec:
     - uri:
         exact: /headers
     - uri:
-        prefix: /delay/.*
+        prefix: /user-agent
     - uri:
         prefix: /ip
+    - uri:
+        prefix: /get
     route:
     - destination:
         host: httpbin
